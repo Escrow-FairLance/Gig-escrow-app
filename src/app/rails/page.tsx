@@ -13,8 +13,8 @@ import {
   CreditCard,
   RefreshCw,
 } from 'lucide-react';
-import { useWallet } from '../../wallet/context.js';
-import { Card, Button, Badge, Input } from '../../components/ui/index.js';
+import { useWallet } from '../../wallet/context';
+import { Card, Button, Badge, Input } from '../../components/ui/index';
 
 interface AnchorOption {
   id: string;

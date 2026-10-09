@@ -1,11 +1,11 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { en } from './locales/en.js';
-import { fr } from './locales/fr.js';
-import { ha } from './locales/ha.js';
-import { yo } from './locales/yo.js';
-import { sw } from './locales/sw.js';
+import { en } from './locales/en';
+import { fr } from './locales/fr';
+import { ha } from './locales/ha';
+import { yo } from './locales/yo';
+import { sw } from './locales/sw';
 
 export type SupportedLanguage = 'en' | 'fr' | 'ha' | 'yo' | 'sw';
 

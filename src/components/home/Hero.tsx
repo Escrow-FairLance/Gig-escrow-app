@@ -3,8 +3,8 @@
 import React from 'react';
 import Link from 'next/link';
 import { ArrowRight, ShieldCheck, Sparkles, CheckCircle2, FileCheck, Landmark } from 'lucide-react';
-import { useI18n } from '../../i18n/context.js';
-import { Button, Card, Badge } from '../ui/index.js';
+import { useI18n } from '../../i18n/context';
+import { Button, Card, Badge } from '../ui/index';
 
 export const Hero: React.FC = () => {
   const { t } = useI18n();

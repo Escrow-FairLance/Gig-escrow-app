@@ -1,10 +1,10 @@
 import React from 'react';
-import { Hero } from '../components/home/Hero.js';
-import { StatBanner } from '../components/home/StatBanner.js';
-import { LiveActivityTicker } from '../components/home/LiveActivityTicker.js';
-import { Features } from '../components/home/Features.js';
-import { HowItWorks } from '../components/home/HowItWorks.js';
-import { RoleCTA } from '../components/home/RoleCTA.js';
+import { Hero } from '../components/home/Hero';
+import { StatBanner } from '../components/home/StatBanner';
+import { LiveActivityTicker } from '../components/home/LiveActivityTicker';
+import { Features } from '../components/home/Features';
+import { HowItWorks } from '../components/home/HowItWorks';
+import { RoleCTA } from '../components/home/RoleCTA';
 
 export default function HomePage() {
   return (

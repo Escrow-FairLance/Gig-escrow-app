@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Briefcase, Code, Scale, ArrowRight, ShieldCheck, Zap, Coins } from 'lucide-react';
-import { Card, Button, Badge } from '../ui/index.js';
+import { Card, Button, Badge } from '../ui/index';
 
 export const RoleCTA: React.FC = () => {
   return (

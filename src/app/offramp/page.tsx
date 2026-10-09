@@ -1,1 +1,1 @@
-export { default } from '../rails/page.js';
+export { default } from '../rails/page';

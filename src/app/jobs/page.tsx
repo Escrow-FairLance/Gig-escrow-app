@@ -3,10 +3,10 @@
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { Plus, Briefcase, Sparkles, AlertCircle } from 'lucide-react';
-import { JobView } from '../../types/escrow.js';
-import { JobFilter, FilterState } from '../../components/jobs/JobFilter.js';
-import { JobCard } from '../../components/jobs/JobCard.js';
-import { Button, Badge } from '../../components/ui/index.js';
+import { JobView } from '../../types/escrow';
+import { JobFilter, FilterState } from '../../components/jobs/JobFilter';
+import { JobCard } from '../../components/jobs/JobCard';
+import { Button, Badge } from '../../components/ui/index';
 
 // Realistic sample jobs on Soroban Testnet
 const initialMockJobs: JobView[] = [

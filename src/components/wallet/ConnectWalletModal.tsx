@@ -2,10 +2,10 @@
 
 import React from 'react';
 import { X, ExternalLink, ShieldCheck, AlertCircle } from 'lucide-react';
-import { SUPPORTED_WALLETS } from '../../wallet/adapters.js';
-import { useWallet } from '../../wallet/context.js';
-import { SupportedWalletId } from '../../types/wallet.js';
-import { STELLAR_CONFIG } from '../../config/constants.js';
+import { SUPPORTED_WALLETS } from '../../wallet/adapters';
+import { useWallet } from '../../wallet/context';
+import { SupportedWalletId } from '../../types/wallet';
+import { STELLAR_CONFIG } from '../../config/constants';
 
 interface ConnectWalletModalProps {
   isOpen: boolean;

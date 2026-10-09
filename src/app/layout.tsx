@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { WalletProvider } from '../wallet/context.js';
-import { I18nProvider } from '../i18n/context.js';
-import { Navbar } from '../components/layout/Navbar.js';
-import { Footer } from '../components/layout/Footer.js';
-import { NetworkBanner } from '../components/common/NetworkBanner.js';
+import { WalletProvider } from '../wallet/context';
+import { I18nProvider } from '../i18n/context';
+import { Navbar } from '../components/layout/Navbar';
+import { Footer } from '../components/layout/Footer';
+import { NetworkBanner } from '../components/common/NetworkBanner';
 
 export const metadata: Metadata = {
   title: 'Escrow-FairLance | Decentralized Milestone Escrow Protocol on Stellar & Soroban',

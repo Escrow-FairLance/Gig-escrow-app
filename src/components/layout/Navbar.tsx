@@ -12,11 +12,11 @@ import {
   LogOut,
   Sparkles,
 } from 'lucide-react';
-import { useWallet } from '../../wallet/context.js';
-import { useI18n, LANGUAGES, SupportedLanguage } from '../../i18n/context.js';
-import { formatAddress, formatStroopsToXlm } from '../../config/constants.js';
-import { ConnectWalletModal } from '../wallet/ConnectWalletModal.js';
-import { Badge, Button } from '../ui/index.js';
+import { useWallet } from '../../wallet/context';
+import { useI18n, LANGUAGES, SupportedLanguage } from '../../i18n/context';
+import { formatAddress, formatStroopsToXlm } from '../../config/constants';
+import { ConnectWalletModal } from '../wallet/ConnectWalletModal';
+import { Badge, Button } from '../ui/index';
 
 export const Navbar: React.FC = () => {
   const pathname = usePathname();

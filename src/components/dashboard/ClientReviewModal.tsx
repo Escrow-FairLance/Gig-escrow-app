@@ -12,7 +12,7 @@ import {
   Copy,
   ExternalLink,
 } from 'lucide-react';
-import { Card, Button, Badge } from '../ui/index.js';
+import { Card, Button, Badge } from '../ui/index';
 
 interface ClientReviewModalProps {
   isOpen: boolean;

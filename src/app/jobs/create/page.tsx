@@ -1,1 +1,1 @@
-export { default } from '../new/page.js';
+export { default } from '../new/page';

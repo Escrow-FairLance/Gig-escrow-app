@@ -17,8 +17,8 @@ import {
   ArrowRight,
   ExternalLink,
 } from 'lucide-react';
-import { formatAddress, formatStroopsToXlm } from '../../../config/constants.js';
-import { Card, Badge, Button } from '../../../components/ui/index.js';
+import { formatAddress, formatStroopsToXlm } from '../../../config/constants';
+import { Card, Badge, Button } from '../../../components/ui/index';
 
 export default function DisputeDetailPage() {
   const params = useParams();

@@ -14,7 +14,7 @@ import {
   Shield,
   Clock,
 } from 'lucide-react';
-import { Card, Badge, Button } from '../ui/index.js';
+import { Card, Badge, Button } from '../ui/index';
 
 type RoleTab = 'client' | 'freelancer' | 'arbitrator';
 

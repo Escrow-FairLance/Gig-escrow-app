@@ -1,6 +1,6 @@
 import { isConnected, getPublicKey, getNetwork, signTransaction } from '@stellar/freighter-api';
-import { STELLAR_CONFIG } from '../config/constants.js';
-import { SupportedWalletId, WalletInfo } from '../types/wallet.js';
+import { STELLAR_CONFIG } from '../config/constants';
+import { SupportedWalletId, WalletInfo } from '../types/wallet';
 
 export const SUPPORTED_WALLETS: WalletInfo[] = [
   {

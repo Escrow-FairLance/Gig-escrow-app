@@ -15,8 +15,8 @@ import {
   Award,
   Clock,
 } from 'lucide-react';
-import { formatAddress, STELLAR_CONFIG } from '../../../config/constants.js';
-import { Card, Button, Badge } from '../../../components/ui/index.js';
+import { formatAddress, STELLAR_CONFIG } from '../../../config/constants';
+import { Card, Button, Badge } from '../../../components/ui/index';
 
 export default function ProfilePage() {
   const params = useParams();

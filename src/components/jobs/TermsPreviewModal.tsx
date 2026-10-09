@@ -12,10 +12,10 @@ import {
   ExternalLink,
   Sparkles,
 } from 'lucide-react';
-import { canonicalJsonStringify, computeTermsHash } from '../../crypto/hasher.js';
-import { formatAddress, STELLAR_CONFIG } from '../../config/constants.js';
-import { useWallet } from '../../wallet/context.js';
-import { Card, Button, Badge } from '../ui/index.js';
+import { canonicalJsonStringify, computeTermsHash } from '../../crypto/hasher';
+import { formatAddress, STELLAR_CONFIG } from '../../config/constants';
+import { useWallet } from '../../wallet/context';
+import { Card, Button, Badge } from '../ui/index';
 
 interface TermsPreviewModalProps {
   isOpen: boolean;

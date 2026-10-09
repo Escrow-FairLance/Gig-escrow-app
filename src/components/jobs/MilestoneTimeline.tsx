@@ -14,9 +14,9 @@ import {
   ChevronDown,
   Sparkles,
 } from 'lucide-react';
-import { MilestoneView, JobStatus } from '../../types/escrow.js';
-import { formatAddress, formatStroopsToXlm } from '../../config/constants.js';
-import { Card, Badge, Button } from '../ui/index.js';
+import { MilestoneView, JobStatus } from '../../types/escrow';
+import { formatAddress, formatStroopsToXlm } from '../../config/constants';
+import { Card, Badge, Button } from '../ui/index';
 
 interface MilestoneTimelineProps {
   milestones: MilestoneView[];

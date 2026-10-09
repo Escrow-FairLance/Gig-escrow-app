@@ -1,4 +1,4 @@
-import { STELLAR_CONFIG } from '../config/constants.js';
+import { STELLAR_CONFIG } from '../config/constants';
 
 export interface TokenMetadata {
   symbol: string;

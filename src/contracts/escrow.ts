@@ -6,7 +6,7 @@ import {
   scValToNative,
   xdr,
 } from '@stellar/stellar-sdk';
-import { STELLAR_CONFIG } from '../config/constants.js';
+import { STELLAR_CONFIG } from '../config/constants';
 
 export interface ContractMilestoneInit {
   amount: bigint;

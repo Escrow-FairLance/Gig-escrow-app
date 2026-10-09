@@ -11,8 +11,8 @@ import {
   Coins,
   ArrowRight,
 } from 'lucide-react';
-import { formatAddress, formatStroopsToXlm } from '../../config/constants.js';
-import { Card, Button, Badge } from '../ui/index.js';
+import { formatAddress, formatStroopsToXlm } from '../../config/constants';
+import { Card, Button, Badge } from '../ui/index';
 
 interface ArbitratorRulingCardProps {
   disputeId: string;

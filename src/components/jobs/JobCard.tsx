@@ -12,9 +12,9 @@ import {
   CheckCircle2,
   AlertTriangle,
 } from 'lucide-react';
-import { JobView } from '../../types/escrow.js';
-import { formatAddress, formatStroopsToXlm } from '../../config/constants.js';
-import { Card, Badge, Button } from '../ui/index.js';
+import { JobView } from '../../types/escrow';
+import { formatAddress, formatStroopsToXlm } from '../../config/constants';
+import { Card, Badge, Button } from '../ui/index';
 
 interface JobCardProps {
   job: JobView;

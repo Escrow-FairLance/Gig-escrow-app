@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import { RotateCw, Handshake, AlertOctagon, CheckCircle2, Shield } from 'lucide-react';
-import { formatStroopsToXlm } from '../../config/constants.js';
-import { Card, Button, Badge } from '../ui/index.js';
+import { formatStroopsToXlm } from '../../config/constants';
+import { Card, Button, Badge } from '../ui/index';
 
 interface CancellationCardProps {
   escrowBalance: string;

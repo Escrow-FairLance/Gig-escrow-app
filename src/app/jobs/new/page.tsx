@@ -15,12 +15,12 @@ import {
   Coins,
   CheckCircle2,
 } from 'lucide-react';
-import { useWallet } from '../../../wallet/context.js';
-import { MilestoneDraft, MilestoneBuilder } from '../../../components/jobs/MilestoneBuilder.js';
-import { ArbitratorSelector } from '../../../components/jobs/ArbitratorSelector.js';
-import { TermsPreviewModal } from '../../../components/jobs/TermsPreviewModal.js';
-import { Button, Card, Badge, Input } from '../../../components/ui/index.js';
-import { CATEGORIES } from '../../../components/jobs/JobFilter.js';
+import { useWallet } from '../../../wallet/context';
+import { MilestoneDraft, MilestoneBuilder } from '../../../components/jobs/MilestoneBuilder';
+import { ArbitratorSelector } from '../../../components/jobs/ArbitratorSelector';
+import { TermsPreviewModal } from '../../../components/jobs/TermsPreviewModal';
+import { Button, Card, Badge, Input } from '../../../components/ui/index';
+import { CATEGORIES } from '../../../components/jobs/JobFilter';
 
 export default function CreateJobPage() {
   const router = useRouter();

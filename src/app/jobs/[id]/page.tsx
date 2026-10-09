@@ -19,16 +19,16 @@ import {
   Sparkles,
   UserCheck,
 } from 'lucide-react';
-import { useWallet } from '../../../wallet/context.js';
-import { JobView, MilestoneView, JobStatus } from '../../../types/escrow.js';
-import { formatAddress, formatStroopsToXlm, STELLAR_CONFIG } from '../../../config/constants.js';
-import { getExplorerContractUrl } from '../../../contracts/tokens.js';
-import { MilestoneTimeline } from '../../../components/jobs/MilestoneTimeline.js';
-import { AutoReleaseTimerCard } from '../../../components/jobs/AutoReleaseTimerCard.js';
-import { RevisionModal } from '../../../components/jobs/RevisionModal.js';
-import { DisputeModal } from '../../../components/jobs/DisputeModal.js';
-import { CancellationCard } from '../../../components/jobs/CancellationCard.js';
-import { Card, Button, Badge } from '../../../components/ui/index.js';
+import { useWallet } from '../../../wallet/context';
+import { JobView, MilestoneView, JobStatus } from '../../../types/escrow';
+import { formatAddress, formatStroopsToXlm, STELLAR_CONFIG } from '../../../config/constants';
+import { getExplorerContractUrl } from '../../../contracts/tokens';
+import { MilestoneTimeline } from '../../../components/jobs/MilestoneTimeline';
+import { AutoReleaseTimerCard } from '../../../components/jobs/AutoReleaseTimerCard';
+import { RevisionModal } from '../../../components/jobs/RevisionModal';
+import { DisputeModal } from '../../../components/jobs/DisputeModal';
+import { CancellationCard } from '../../../components/jobs/CancellationCard';
+import { Card, Button, Badge } from '../../../components/ui/index';
 
 // Realistic sample job mock
 const sampleJob: JobView = {

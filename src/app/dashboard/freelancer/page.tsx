@@ -14,10 +14,10 @@ import {
   RotateCw,
   Landmark,
 } from 'lucide-react';
-import { useWallet } from '../../../wallet/context.js';
-import { formatAddress, formatStroopsToXlm } from '../../../config/constants.js';
-import { DeliverableSubmitModal } from '../../../components/dashboard/DeliverableSubmitModal.js';
-import { Card, Button, Badge } from '../../../components/ui/index.js';
+import { useWallet } from '../../../wallet/context';
+import { formatAddress, formatStroopsToXlm } from '../../../config/constants';
+import { DeliverableSubmitModal } from '../../../components/dashboard/DeliverableSubmitModal';
+import { Card, Button, Badge } from '../../../components/ui/index';
 
 interface FreelancerMilestoneItem {
   jobId: string;

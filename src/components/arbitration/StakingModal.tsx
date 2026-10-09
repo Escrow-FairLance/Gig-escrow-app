@@ -11,8 +11,8 @@ import {
   CheckCircle2,
   TrendingUp,
 } from 'lucide-react';
-import { formatStroopsToXlm } from '../../config/constants.js';
-import { Card, Button, Badge } from '../ui/index.js';
+import { formatStroopsToXlm } from '../../config/constants';
+import { Card, Button, Badge } from '../ui/index';
 
 interface StakingModalProps {
   isOpen: boolean;

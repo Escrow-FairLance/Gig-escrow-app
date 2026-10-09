@@ -11,8 +11,8 @@ import {
   Copy,
   AlertCircle,
 } from 'lucide-react';
-import { computeFileSha256, computeSha256 } from '../../crypto/hasher.js';
-import { Card, Button, Badge } from '../ui/index.js';
+import { computeFileSha256, computeSha256 } from '../../crypto/hasher';
+import { Card, Button, Badge } from '../ui/index';
 
 interface DeliverableSubmitModalProps {
   isOpen: boolean;

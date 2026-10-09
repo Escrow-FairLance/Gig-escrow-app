@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Coins, ExternalLink, Zap } from 'lucide-react';
-import { STELLAR_CONFIG, formatAddress } from '../../config/constants.js';
+import { STELLAR_CONFIG, formatAddress } from '../../config/constants';
 
 export const NetworkBanner: React.FC = () => {
   return (

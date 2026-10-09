@@ -11,9 +11,9 @@ import {
   Coins,
   Sparkles,
 } from 'lucide-react';
-import { ArbitratorCandidateView } from '../../types/escrow.js';
-import { formatAddress, formatStroopsToXlm } from '../../config/constants.js';
-import { Card, Badge, Button } from '../ui/index.js';
+import { ArbitratorCandidateView } from '../../types/escrow';
+import { formatAddress, formatStroopsToXlm } from '../../config/constants';
+import { Card, Badge, Button } from '../ui/index';
 
 interface ArbitratorSelectorProps {
   panelSize: 1 | 3 | 5 | 7;

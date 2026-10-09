@@ -13,10 +13,10 @@ import {
   TrendingUp,
   Sparkles,
 } from 'lucide-react';
-import { useWallet } from '../../wallet/context.js';
-import { StakingModal } from '../../components/arbitration/StakingModal.js';
-import { ArbitratorRulingCard } from '../../components/arbitration/ArbitratorRulingCard.js';
-import { Card, Button, Badge } from '../../components/ui/index.js';
+import { useWallet } from '../../wallet/context';
+import { StakingModal } from '../../components/arbitration/StakingModal';
+import { ArbitratorRulingCard } from '../../components/arbitration/ArbitratorRulingCard';
+import { Card, Button, Badge } from '../../components/ui/index';
 
 interface DisputeCaseItem {
   id: string;

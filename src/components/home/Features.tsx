@@ -11,8 +11,8 @@ import {
   RotateCcw,
   Zap,
 } from 'lucide-react';
-import { useI18n } from '../../i18n/context.js';
-import { Card, Badge } from '../ui/index.js';
+import { useI18n } from '../../i18n/context';
+import { Card, Badge } from '../ui/index';
 
 export const Features: React.FC = () => {
   const { t } = useI18n();

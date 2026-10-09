@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import { RotateCcw, AlertTriangle, X, ShieldCheck, FileText, CheckCircle2 } from 'lucide-react';
-import { computeSha256 } from '../../crypto/hasher.js';
-import { Card, Button, Badge } from '../ui/index.js';
+import { computeSha256 } from '../../crypto/hasher';
+import { Card, Button, Badge } from '../ui/index';
 
 interface RevisionModalProps {
   isOpen: boolean;

@@ -1,5 +1,5 @@
-import { STELLAR_CONFIG } from '../config/constants.js';
-import { ArbitratorCandidateView, DisputeView, JobView, MilestoneView } from '../types/escrow.js';
+import { STELLAR_CONFIG } from '../config/constants';
+import { ArbitratorCandidateView, DisputeView, JobView, MilestoneView } from '../types/escrow';
 
 class ApiClient {
   private baseUrl: string;

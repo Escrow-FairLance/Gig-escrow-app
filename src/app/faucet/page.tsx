@@ -2,9 +2,9 @@
 
 import React, { useState } from 'react';
 import { Coins, Sparkles, CheckCircle2, ExternalLink, ArrowRight, Zap, ShieldCheck } from 'lucide-react';
-import { useWallet } from '../../wallet/context.js';
-import { formatAddress, STELLAR_CONFIG } from '../../config/constants.js';
-import { Card, Button, Badge } from '../../components/ui/index.js';
+import { useWallet } from '../../wallet/context';
+import { formatAddress, STELLAR_CONFIG } from '../../config/constants';
+import { Card, Button, Badge } from '../../components/ui/index';
 
 export default function FaucetPage() {
   const { state: wallet, refreshBalances } = useWallet();

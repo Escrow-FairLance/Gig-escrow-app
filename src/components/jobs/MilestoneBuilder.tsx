@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Plus, Trash2, Layers, Calendar, DollarSign, AlertCircle, Info } from 'lucide-react';
-import { Card, Button, Input, Badge } from '../ui/index.js';
+import { Card, Button, Input, Badge } from '../ui/index';
 
 export interface MilestoneDraft {
   id: string;

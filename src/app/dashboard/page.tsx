@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { Briefcase, Code, ArrowRight, ShieldCheck, Coins, Layers } from 'lucide-react';
-import { Card, Button, Badge } from '../../components/ui/index.js';
+import { Card, Button, Badge } from '../../components/ui/index';
 
 export default function DashboardPortalPage() {
   return (

@@ -1,9 +1,9 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { STELLAR_CONFIG } from '../config/constants.js';
-import { SupportedWalletId, WalletBalance, WalletState } from '../types/wallet.js';
-import { getWalletAdapter } from './adapters.js';
+import { STELLAR_CONFIG } from '../config/constants';
+import { SupportedWalletId, WalletBalance, WalletState } from '../types/wallet';
+import { getWalletAdapter } from './adapters';
 
 interface WalletContextType {
   state: WalletState;

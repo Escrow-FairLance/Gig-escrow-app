@@ -3,8 +3,8 @@
 import React from 'react';
 import Link from 'next/link';
 import { ExternalLink, Sparkles, Shield, Heart } from 'lucide-react';
-import { STELLAR_CONFIG, formatAddress } from '../../config/constants.js';
-import { getExplorerContractUrl } from '../../contracts/tokens.js';
+import { STELLAR_CONFIG, formatAddress } from '../../config/constants';
+import { getExplorerContractUrl } from '../../contracts/tokens';
 
 export const Footer: React.FC = () => {
   return (

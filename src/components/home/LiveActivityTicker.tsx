@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Activity, ShieldCheck, CheckCircle2, Scale, Lock, ArrowUpRight } from 'lucide-react';
-import { Badge } from '../ui/index.js';
+import { Badge } from '../ui/index';
 
 interface TickerItem {
   id: string;

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Clock, ShieldCheck, Zap, AlertCircle, ArrowUpRight } from 'lucide-react';
-import { Card, Button, Badge } from '../ui/index.js';
+import { Card, Button, Badge } from '../ui/index';
 
 interface AutoReleaseTimerCardProps {
   milestoneIndex: number;

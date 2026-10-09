@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Lock, Scale, Zap, Globe2 } from 'lucide-react';
-import { Card } from '../ui/index.js';
+import { Card } from '../ui/index';
 
 export const StatBanner: React.FC = () => {
   const stats = [

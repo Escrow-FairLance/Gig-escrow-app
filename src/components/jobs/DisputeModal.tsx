@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import { Scale, AlertTriangle, X, ShieldAlert, FileText, Lock } from 'lucide-react';
-import { computeSha256 } from '../../crypto/hasher.js';
-import { Button, Card, Badge } from '../ui/index.js';
+import { computeSha256 } from '../../crypto/hasher';
+import { Button, Card, Badge } from '../ui/index';
 
 interface DisputeModalProps {
   isOpen: boolean;

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Search, SlidersHorizontal, Sparkles, Filter } from 'lucide-react';
-import { Badge } from '../ui/index.js';
+import { Badge } from '../ui/index';
 
 export interface FilterState {
   search: string;
