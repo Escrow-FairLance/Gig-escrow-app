@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
+import React, { createContext, useContext, useEffect, useState, useMemo, useCallback } from 'react';
 import { STELLAR_CONFIG } from '../config/constants';
 import { SupportedWalletId, WalletBalance, WalletState } from '../types/wallet';
 import { getWalletAdapter } from './adapters';
@@ -118,17 +118,17 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   };
 
-  const signTransaction = async (xdr: string): Promise<string> => {
+  const signTransaction = useCallback(async (xdr: string): Promise<string> => {
     if (!state.walletId) {
       throw new Error('No wallet connected to sign transaction');
     }
     const adapter = getWalletAdapter(state.walletId);
     return adapter.sign(xdr);
-  };
+  }, [state.walletId]);
 
   const signer = useMemo<SorobanTransactionSigner>(() => ({
     sign: async (xdrString: string) => signTransaction(xdrString),
-  }), [state.walletId]);
+  }), [signTransaction]);
 
   useEffect(() => {
     const savedWallet = localStorage.getItem('fairlance_wallet') as SupportedWalletId;

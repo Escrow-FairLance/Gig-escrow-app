@@ -42,6 +42,7 @@
     "tailwind-merge": "^2.5.4"
   },
   "devDependencies": {
+    "@types/bun": "^1.4.4",
     "@types/node": "^22.7.5",
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.0",
