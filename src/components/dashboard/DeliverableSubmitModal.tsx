@@ -14,12 +14,15 @@ import {
 import { computeFileSha256, computeSha256 } from '../../crypto/hasher';
 import { Card, Button, Badge } from '../ui/index';
 
+import { deliverableStorageClient } from '../../storage/ipfs';
+
 interface DeliverableSubmitModalProps {
   isOpen: boolean;
   onClose: () => void;
   milestoneTitle: string;
   milestoneIndex: number;
-  onSubmitSuccess: (hash: string, notes: string) => Promise<void>;
+  jobId?: string;
+  onSubmitSuccess: (hash: string, notes: string, cid?: string) => Promise<void>;
 }
 
 export const DeliverableSubmitModal: React.FC<DeliverableSubmitModalProps> = ({
@@ -27,10 +30,13 @@ export const DeliverableSubmitModal: React.FC<DeliverableSubmitModalProps> = ({
   onClose,
   milestoneTitle,
   milestoneIndex,
+  jobId = 'job-active',
   onSubmitSuccess,
 }) => {
   const [file, setFile] = useState<File | null>(null);
   const [fileHash, setFileHash] = useState<string>('');
+  const [cid, setCid] = useState<string>('');
+  const [encryptionPassphrase, setEncryptionPassphrase] = useState<string>('fairlance-escrow-key');
   const [isHashing, setIsHashing] = useState<boolean>(false);
   const [notes, setNotes] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -47,7 +53,6 @@ export const DeliverableSubmitModal: React.FC<DeliverableSubmitModalProps> = ({
         setFileHash(hash);
         setIsHashing(false);
       } catch {
-        // Fallback text hash
         const hash = await computeSha256(selected.name + selected.size);
         setFileHash(hash);
         setIsHashing(false);
@@ -57,17 +62,28 @@ export const DeliverableSubmitModal: React.FC<DeliverableSubmitModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!fileHash) {
+    if (!file || !fileHash) {
       alert('Please upload a deliverable file or code bundle');
       return;
     }
 
     setIsSubmitting(true);
     try {
-      await onSubmitSuccess(fileHash, notes);
+      // Encrypt file with AES-256-GCM and archive to IPFS vault
+      const archive = await deliverableStorageClient.uploadEncryptedDeliverable({
+        file,
+        jobId,
+        milestoneIndex,
+        encryptionSecret: encryptionPassphrase || 'fairlance-escrow-key',
+      });
+      setCid(archive.cid);
+
+      await onSubmitSuccess(fileHash, notes, archive.cid);
       setIsSubmitting(false);
       onClose();
-    } catch {
+    } catch (err: any) {
+      console.error('[DeliverableSubmitModal] Submission error:', err);
+      alert(err.message || 'Failed to encrypt and archive deliverable');
       setIsSubmitting(false);
     }
   };

@@ -9,10 +9,10 @@ import {
   ShieldCheck,
   FileCheck,
   Clock,
-  Copy,
-  ExternalLink,
+  Download,
 } from 'lucide-react';
 import { Card, Button, Badge } from '../ui/index';
+import { deliverableStorageClient } from '../../storage/ipfs';
 
 interface ClientReviewModalProps {
   isOpen: boolean;
@@ -47,8 +47,32 @@ export const ClientReviewModal: React.FC<ClientReviewModalProps> = ({
   const [feedback, setFeedback] = useState('');
   const [disputeReason, setDisputeReason] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isDecrypting, setIsDecrypting] = useState(false);
+  const [downloadSuccess, setDownloadSuccess] = useState(false);
 
   if (!isOpen) return null;
+
+  const handleDownloadAndDecrypt = async () => {
+    setIsDecrypting(true);
+    try {
+      const { data, packageInfo } = await deliverableStorageClient.retrieveAndDecryptDeliverable({
+        sha256OrCid: deliverableHash,
+        encryptionSecret: 'fairlance-escrow-key',
+      });
+      const blob = new Blob([data], { type: packageInfo.mimeType || 'application/octet-stream' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = packageInfo.originalFileName || `deliverable-${milestoneIndex + 1}.bin`;
+      a.click();
+      URL.revokeObjectURL(url);
+      setDownloadSuccess(true);
+    } catch (err: any) {
+      alert(err.message || 'Deliverable package not available in local testnet cache.');
+    } finally {
+      setIsDecrypting(false);
+    }
+  };
 
   const handleApproveClick = async () => {
     setIsProcessing(true);
@@ -111,36 +135,33 @@ export const ClientReviewModal: React.FC<ClientReviewModalProps> = ({
           </button>
         </div>
 
-        {/* Tab Selector */}
-        <div className="flex items-center gap-2 p-1 rounded-xl bg-surface-200/80 border border-white/10 mb-6 text-xs">
+        {/* Tab Controls */}
+        <div className="flex items-center gap-2 mb-6 p-1 bg-surface-200/60 rounded-xl border border-white/5">
           <button
-            type="button"
             onClick={() => setActiveTab('inspect')}
-            className={`flex-1 py-1.5 rounded-lg font-bold transition-all ${
+            className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-medium transition-all ${
               activeTab === 'inspect'
-                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 shadow-sm'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
             Inspect & Sign Off
           </button>
           <button
-            type="button"
             onClick={() => setActiveTab('revision')}
-            className={`flex-1 py-1.5 rounded-lg font-bold transition-all ${
+            className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-medium transition-all ${
               activeTab === 'revision'
-                ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
+                ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30 shadow-sm'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
             Request Revision ({revisionCount}/2)
           </button>
           <button
-            type="button"
             onClick={() => setActiveTab('dispute')}
-            className={`flex-1 py-1.5 rounded-lg font-bold transition-all ${
+            className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-medium transition-all ${
               activeTab === 'dispute'
-                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                ? 'bg-rose-500/10 text-rose-400 border border-rose-500/30 shadow-sm'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
@@ -168,6 +189,25 @@ export const ClientReviewModal: React.FC<ClientReviewModalProps> = ({
                 Approving executes immediate non-custodial smart contract transfer directly to the freelancer&apos;s
                 wallet on the Stellar network.
               </p>
+
+              <div className="flex items-center justify-between pt-2 border-t border-white/5">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={handleDownloadAndDecrypt}
+                  disabled={isDecrypting}
+                  className="text-xs gap-1.5 border-cyan-500/30 hover:border-cyan-400 text-cyan-300"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>{isDecrypting ? 'Decrypting AES-256...' : 'Download & Decrypt Archive'}</span>
+                </Button>
+                {downloadSuccess && (
+                  <span className="text-[10px] text-emerald-400 flex items-center gap-1 font-mono">
+                    <CheckCircle2 className="w-3 h-3" /> Integrity Verified
+                  </span>
+                )}
+              </div>
             </div>
 
             <div className="flex items-center justify-end gap-3 pt-3 border-t border-white/5">
@@ -178,43 +218,53 @@ export const ClientReviewModal: React.FC<ClientReviewModalProps> = ({
                 variant="primary"
                 isLoading={isProcessing}
                 onClick={handleApproveClick}
-                className="bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold gap-2 shadow-glow"
+                className="gap-2 shadow-glow"
               >
-                <CheckCircle2 className="w-4 h-4" />
-                <span>Approve Instant Payout ({amount} {currency})</span>
+                <CheckCircle2 className="w-4 h-4 text-slate-950" />
+                <span>Sign Off & Release Payout</span>
               </Button>
             </div>
           </div>
         )}
 
-        {/* Tab 2: Revision */}
+        {/* Tab 2: Request Revision */}
         {activeTab === 'revision' && (
           <form onSubmit={handleRevisionSubmit} className="space-y-4">
+            <div className="p-3.5 rounded-xl bg-amber-950/20 border border-amber-500/20 text-xs text-amber-300 space-y-1">
+              <span className="font-bold">Strict 2-Revision Limit Protection:</span>
+              <p className="text-slate-400 text-[11px]">
+                Clients are allotted up to 2 revisions per milestone to prevent scope creep. Feedback is
+                hashed and committed on-chain.
+              </p>
+            </div>
+
             <div className="space-y-1.5">
               <label className="block text-xs font-medium text-slate-300">
-                Revision Feedback
+                Actionable Feedback for Freelancer
               </label>
               <textarea
                 rows={4}
                 required
                 value={feedback}
                 onChange={(e) => setFeedback(e.target.value)}
-                placeholder="State specific adjustments required before sign-off..."
-                className="w-full px-3.5 py-2.5 rounded-xl bg-surface-200/80 border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-purple-400 resize-none"
+                placeholder="Explicitly detail discrepancies against original milestone terms..."
+                className="w-full px-3.5 py-2.5 rounded-xl bg-surface-200/80 border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-cyan-400 resize-none"
               />
             </div>
 
             <div className="flex items-center justify-end gap-3 pt-3 border-t border-white/5">
-              <Button variant="outline" type="button" onClick={onClose}>
+              <Button variant="outline" type="button" onClick={onClose} disabled={isProcessing}>
                 Cancel
               </Button>
               <Button
                 type="submit"
-                variant="secondary"
+                variant="outline"
                 isLoading={isProcessing}
-                className="text-purple-300 hover:text-white border-purple-500/30"
+                disabled={revisionCount >= 2 || !feedback.trim()}
+                className="gap-2 text-amber-400 border-amber-500/30 hover:border-amber-400"
               >
-                Submit Revision Request
+                <RotateCcw className="w-4 h-4" />
+                <span>Commit Revision Request (#{revisionCount + 1}/2)</span>
               </Button>
             </div>
           </form>
@@ -223,31 +273,43 @@ export const ClientReviewModal: React.FC<ClientReviewModalProps> = ({
         {/* Tab 3: Dispute */}
         {activeTab === 'dispute' && (
           <form onSubmit={handleDisputeSubmit} className="space-y-4">
+            <div className="p-3.5 rounded-xl bg-rose-950/20 border border-rose-500/20 text-xs text-rose-300 space-y-1">
+              <span className="font-bold flex items-center gap-1.5">
+                <AlertTriangle className="w-4 h-4 text-rose-400" />
+                Escalate to Decentralized Arbitrator Panel
+              </span>
+              <p className="text-slate-400 text-[11px]">
+                Freezes escrow balance and transfers ruling authority to the odd-sized juror quorum.
+              </p>
+            </div>
+
             <div className="space-y-1.5">
               <label className="block text-xs font-medium text-slate-300">
-                Dispute Justification
+                Dispute Claim & Justification
               </label>
               <textarea
                 rows={4}
                 required
                 value={disputeReason}
                 onChange={(e) => setDisputeReason(e.target.value)}
-                placeholder="Provide detailed justification for the odd-panel arbitrators..."
-                className="w-full px-3.5 py-2.5 rounded-xl bg-surface-200/80 border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-amber-400 resize-none"
+                placeholder="Describe reason for dispute, lack of delivery, or critical contract violation..."
+                className="w-full px-3.5 py-2.5 rounded-xl bg-surface-200/80 border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-cyan-400 resize-none"
               />
             </div>
 
             <div className="flex items-center justify-end gap-3 pt-3 border-t border-white/5">
-              <Button variant="outline" type="button" onClick={onClose}>
+              <Button variant="outline" type="button" onClick={onClose} disabled={isProcessing}>
                 Cancel
               </Button>
               <Button
                 type="submit"
                 variant="danger"
                 isLoading={isProcessing}
-                className="text-amber-300 border-amber-500/30 hover:bg-amber-950/30"
+                disabled={!disputeReason.trim()}
+                className="gap-2"
               >
-                Open Arbitration Dispute
+                <AlertTriangle className="w-4 h-4" />
+                <span>Open Formal Dispute</span>
               </Button>
             </div>
           </form>
