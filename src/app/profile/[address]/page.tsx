@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import {
@@ -17,10 +17,24 @@ import {
 } from 'lucide-react';
 import { formatAddress, STELLAR_CONFIG } from '../../../config/constants';
 import { Card, Button, Badge } from '../../../components/ui/index';
+import { api } from '../../../api/client';
 
 export default function ProfilePage() {
   const params = useParams();
   const address = (params.address as string) || 'GB3Y9KM5NPXZTR12VWQ56PZTRK88LMN456QAZTYKMPQRSTVWYZ';
+  const [profileJobs, setProfileJobs] = useState<any[]>([]);
+
+  useEffect(() => {
+    let active = true;
+    api.getJobs({ userAddress: address })
+      .then((res) => {
+        if (active && res?.jobs) {
+          setProfileJobs(res.jobs);
+        }
+      })
+      .catch(() => {});
+    return () => { active = false; };
+  }, [address]);
 
   const mockProfile = {
     address,

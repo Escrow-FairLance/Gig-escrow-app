@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { Plus, Briefcase, Sparkles, AlertCircle } from 'lucide-react';
 import { JobView } from '../../types/escrow';
 import { JobFilter, FilterState } from '../../components/jobs/JobFilter';
 import { JobCard } from '../../components/jobs/JobCard';
 import { Button, Badge } from '../../components/ui/index';
+import { api } from '../../api/client';
 
 // Realistic sample jobs on Soroban Testnet
 const initialMockJobs: JobView[] = [
@@ -210,7 +211,23 @@ const initialMockJobs: JobView[] = [
 ];
 
 export default function JobsPage() {
-  const [jobs] = useState<JobView[]>(initialMockJobs);
+  const [jobs, setJobs] = useState<JobView[]>(initialMockJobs);
+
+  useEffect(() => {
+    let active = true;
+    api.getJobs()
+      .then((data) => {
+        if (active && data?.jobs && data.jobs.length > 0) {
+          setJobs(data.jobs);
+        }
+      })
+      .catch(() => {
+        // Retain seed data if backend is offline
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
   const [filters, setFilters] = useState<FilterState>({
     search: '',
     category: '',
