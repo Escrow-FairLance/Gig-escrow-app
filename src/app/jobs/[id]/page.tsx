@@ -20,6 +20,7 @@ import {
   UserCheck,
 } from 'lucide-react';
 import { useWallet } from '../../../wallet/context';
+import { escrowContractClient } from '../../../contracts/escrow';
 import { JobView, MilestoneView, JobStatus } from '../../../types/escrow';
 import { formatAddress, formatStroopsToXlm, STELLAR_CONFIG } from '../../../config/constants';
 import { getExplorerContractUrl } from '../../../contracts/tokens';
@@ -91,7 +92,7 @@ const sampleJob: JobView = {
 
 export default function JobDetailPage() {
   const params = useParams();
-  const { state: wallet } = useWallet();
+  const { state: wallet, signer } = useWallet();
   const [job, setJob] = useState<JobView>(sampleJob);
 
   // Modals state
@@ -112,19 +113,27 @@ export default function JobDetailPage() {
 
   // Handlers
   const handleApprovePayout = async (milestoneIdx: number) => {
-    const updated = { ...job };
-    updated.milestones[milestoneIdx].status = 'APPROVED';
-    updated.milestones[milestoneIdx].approvedAt = new Date().toISOString();
-    const paidAmount = BigInt(updated.milestones[milestoneIdx].amount);
-    updated.escrowBalance = (BigInt(updated.escrowBalance) - paidAmount).toString();
+    try {
+      const caller = wallet.address || job.clientAddress;
+      await escrowContractClient.approveMilestone(caller, 1n, milestoneIdx, signer);
 
-    if (milestoneIdx + 1 < updated.milestones.length) {
-      updated.currentMilestoneIndex = milestoneIdx + 1;
-    } else {
-      updated.status = 'COMPLETED';
+      const updated = { ...job };
+      updated.milestones[milestoneIdx].status = 'APPROVED';
+      updated.milestones[milestoneIdx].approvedAt = new Date().toISOString();
+      const paidAmount = BigInt(updated.milestones[milestoneIdx].amount);
+      updated.escrowBalance = (BigInt(updated.escrowBalance) - paidAmount).toString();
+
+      if (milestoneIdx + 1 < updated.milestones.length) {
+        updated.currentMilestoneIndex = milestoneIdx + 1;
+      } else {
+        updated.status = 'COMPLETED';
+      }
+      setJob(updated);
+      showNotification(`Milestone #${milestoneIdx + 1} approved! Instant payout confirmed on Soroban.`);
+    } catch (err: any) {
+      console.error('[JobDetail] Approval error:', err);
+      alert(err.message || 'Failed to approve milestone on-chain');
     }
-    setJob(updated);
-    showNotification(`Milestone #${milestoneIdx + 1} approved! Instant payout dispatched on-chain.`);
   };
 
   const handleOpenRevisionModal = (milestoneIdx: number) => {
@@ -133,13 +142,21 @@ export default function JobDetailPage() {
   };
 
   const handleConfirmRevision = async (feedbackText: string, feedbackHash: string) => {
-    const updated = { ...job };
-    const m = updated.milestones[selectedMilestoneIdx];
-    m.status = 'REVISION_REQUESTED';
-    m.revisionCount += 1;
-    m.revisionFeedbackHash = feedbackHash;
-    setJob(updated);
-    showNotification(`Revision #${m.revisionCount} requested and committed to Soroban!`);
+    try {
+      const caller = wallet.address || job.clientAddress;
+      await escrowContractClient.requestRevision(caller, 1n, selectedMilestoneIdx, feedbackHash, signer);
+
+      const updated = { ...job };
+      const m = updated.milestones[selectedMilestoneIdx];
+      m.status = 'REVISION_REQUESTED';
+      m.revisionCount += 1;
+      m.revisionFeedbackHash = feedbackHash;
+      setJob(updated);
+      showNotification(`Revision #${m.revisionCount} requested and committed to Soroban!`);
+    } catch (err: any) {
+      console.error('[JobDetail] Revision error:', err);
+      alert(err.message || 'Failed to request revision on-chain');
+    }
   };
 
   const handleOpenDisputeModal = (milestoneIdx: number) => {
@@ -148,16 +165,31 @@ export default function JobDetailPage() {
   };
 
   const handleConfirmDispute = async (reasonText: string, reasonHash: string) => {
-    const updated = { ...job };
-    updated.milestones[selectedMilestoneIdx].status = 'DISPUTED';
-    updated.status = 'DISPUTED';
-    setJob(updated);
-    showNotification('Dispute registered! Assigned to 3-juror arbitration panel.');
+    try {
+      const caller = wallet.address || job.clientAddress;
+      await escrowContractClient.openDispute(caller, 1n, selectedMilestoneIdx, reasonHash, signer);
+
+      const updated = { ...job };
+      updated.milestones[selectedMilestoneIdx].status = 'DISPUTED';
+      updated.status = 'DISPUTED';
+      setJob(updated);
+      showNotification('Dispute registered on Soroban! Escrow locked for 3-juror arbitration panel.');
+    } catch (err: any) {
+      console.error('[JobDetail] Dispute error:', err);
+      alert(err.message || 'Failed to register dispute on-chain');
+    }
   };
 
   const handleAutoRelease = async (milestoneIdx: number) => {
-    await handleApprovePayout(milestoneIdx);
-    showNotification('Anti-ghosting auto-release executed! Payment successfully delivered.');
+    try {
+      const caller = wallet.address || job.freelancerAddress;
+      await escrowContractClient.autoReleasePayment(caller, 1n, milestoneIdx, signer);
+      await handleApprovePayout(milestoneIdx);
+      showNotification('Anti-ghosting auto-release confirmed! Payout successfully delivered.');
+    } catch (err: any) {
+      console.error('[JobDetail] Auto-release error:', err);
+      alert(err.message || 'Failed to trigger auto-release on-chain');
+    }
   };
 
   const handleMutualCancel = async () => {
@@ -167,9 +199,17 @@ export default function JobDetailPage() {
   };
 
   const handleReclaimStalled = async () => {
-    const updated = { ...job, status: 'STALLED_RECLAIMED' as JobStatus, escrowBalance: '0' };
-    setJob(updated);
-    showNotification('Unreleased escrow funds successfully reclaimed by client.');
+    try {
+      const caller = wallet.address || job.clientAddress;
+      await escrowContractClient.reclaimStalledJob(caller, 1n, signer);
+
+      const updated = { ...job, status: 'STALLED_RECLAIMED' as JobStatus, escrowBalance: '0' };
+      setJob(updated);
+      showNotification('Unreleased escrow funds successfully reclaimed by client on Soroban.');
+    } catch (err: any) {
+      console.error('[JobDetail] Reclaim error:', err);
+      alert(err.message || 'Failed to reclaim stalled escrow funds on-chain');
+    }
   };
 
   const currentMilestone = job.milestones[job.currentMilestoneIndex];
