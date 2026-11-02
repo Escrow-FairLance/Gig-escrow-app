@@ -165,7 +165,7 @@ export const ClientReviewModal: React.FC<ClientReviewModalProps> = ({
                 0x{deliverableHash}
               </div>
               <p className="text-[11px] text-slate-400 leading-relaxed">
-                Approving executes immediate non-custodial smart contract transfer directly to the freelancer's
+                Approving executes immediate non-custodial smart contract transfer directly to the freelancer&apos;s
                 wallet on the Stellar network.
               </p>
             </div>

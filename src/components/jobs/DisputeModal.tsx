@@ -86,7 +86,7 @@ export const DisputeModal: React.FC<DisputeModalProps> = ({
             </div>
             <p className="text-xs text-slate-300 leading-relaxed">
               Once escalated, the milestone escrow funds are frozen. The designated {arbitratorPanelCount}-member
-              arbitration panel will review both parties' claims, examine cryptographic deliverable hashes,
+              arbitration panel will review both parties&apos; claims, examine cryptographic deliverable hashes,
               and cast votes to reach majority consensus.
             </p>
             <div className="text-[11px] font-mono text-amber-400">

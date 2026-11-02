@@ -183,7 +183,7 @@ export default function ClientDashboardPage() {
                   <div className="p-2.5 rounded-lg bg-amber-950/30 border border-amber-500/30 text-xs flex items-center justify-between gap-2">
                     <span className="text-amber-300 font-medium flex items-center gap-1.5">
                       <Clock className="w-3.5 h-3.5 text-amber-400" />
-                      Milestone #{job.pendingReviewMilestone.idx + 1} Submitted: "{job.pendingReviewMilestone.title}"
+                      Milestone #{job.pendingReviewMilestone.idx + 1} Submitted: &quot;{job.pendingReviewMilestone.title}&quot;
                     </span>
                     <Button
                       size="sm"
