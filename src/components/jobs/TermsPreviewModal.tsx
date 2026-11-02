@@ -12,9 +12,10 @@ import {
   ExternalLink,
   Sparkles,
 } from 'lucide-react';
-import { canonicalJsonStringify, computeTermsHash } from '../../crypto/hasher';
+import { canonicalJsonStringify, computeTermsHash, computeSha256 } from '../../crypto/hasher';
 import { formatAddress, STELLAR_CONFIG } from '../../config/constants';
 import { useWallet } from '../../wallet/context';
+import { escrowContractClient } from '../../contracts/escrow';
 import { Card, Button, Badge } from '../ui/index';
 
 interface TermsPreviewModalProps {
@@ -47,7 +48,7 @@ export const TermsPreviewModal: React.FC<TermsPreviewModalProps> = ({
   jobDraft,
   onConfirmSuccess,
 }) => {
-  const { state: wallet } = useWallet();
+  const { state: wallet, signer } = useWallet();
   const [canonicalJson, setCanonicalJson] = useState<string>('');
   const [termsHash, setTermsHash] = useState<string>('');
   const [copied, setCopied] = useState<boolean>(false);
@@ -98,20 +99,50 @@ export const TermsPreviewModal: React.FC<TermsPreviewModalProps> = ({
     setStep('funding');
 
     try {
-      // Simulate Soroban Contract Invocation: create_job
-      // In production, invokes contract with client signature
-      await new Promise((resolve) => setTimeout(resolve, 2500));
+      const clientAddress = wallet.address;
+      if (!clientAddress) {
+        throw new Error('Wallet not connected. Please connect Freighter or your preferred Stellar wallet.');
+      }
 
-      const mockTx =
-        '3f9a7c2b' +
-        Math.random().toString(16).substring(2, 10) +
-        '88e1' +
-        Math.random().toString(16).substring(2, 10);
-      setTxResult(mockTx);
+      // Compute milestone title hashes and amount in Stroops
+      const milestoneParams = await Promise.all(
+        jobDraft.milestones.map(async (m) => {
+          const titleHash = await computeSha256(m.title);
+          const amountStroops = BigInt(Math.floor(parseFloat(m.amount) * 10_000_000));
+          const deadlineSeconds = BigInt(Math.floor(Date.now() / 1000) + m.durationDays * 86400);
+          return {
+            amount: amountStroops,
+            deadline: deadlineSeconds,
+            titleHashHex: titleHash,
+          };
+        })
+      );
+
+      const result = await escrowContractClient.createJob(
+        {
+          client: clientAddress,
+          freelancer: jobDraft.freelancerAddress || clientAddress,
+          token: jobDraft.tokenAddress || STELLAR_CONFIG.nativeTokenId,
+          milestones: milestoneParams,
+          termsHashHex: termsHash,
+          arbitratorFeeBps: 500, // 5%
+          clientCancelFeeBps: 200, // 2%
+          reviewWindowSeconds: jobDraft.reviewWindowHours * 3600,
+          workTimeoutSeconds: jobDraft.workTimeoutDays * 86400,
+          disputeWindowSeconds: jobDraft.disputeWindowDays * 86400,
+          arbitratorStakeReq: 100_000_000n,
+          arbitratorPanel: jobDraft.arbitrators,
+        },
+        signer
+      );
+
+      setTxResult(result.txHash);
       setStep('success');
       setIsSubmitting(false);
-      onConfirmSuccess(mockTx);
-    } catch {
+      onConfirmSuccess(result.txHash);
+    } catch (err: any) {
+      console.error('[TermsPreviewModal] Failed to fund escrow:', err);
+      alert(err.message || 'Failed to submit escrow transaction on-chain');
       setIsSubmitting(false);
       setStep('review');
     }
