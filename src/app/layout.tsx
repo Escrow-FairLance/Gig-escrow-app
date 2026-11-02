@@ -1,10 +1,15 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { WalletProvider } from '../wallet/context';
 import { I18nProvider } from '../i18n/context';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
 import { NetworkBanner } from '../components/common/NetworkBanner';
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+};
 
 export const metadata: Metadata = {
   title: 'Escrow-FairLance | Decentralized Milestone Escrow Protocol on Stellar & Soroban',
@@ -22,7 +27,6 @@ export const metadata: Metadata = {
     'Off-Ramp',
   ],
   authors: [{ name: 'Escrow-FairLance Team' }],
-  viewport: 'width=device-width, initial-scale=1',
 };
 
 export default function RootLayout({
