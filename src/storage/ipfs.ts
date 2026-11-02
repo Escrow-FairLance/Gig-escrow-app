@@ -18,6 +18,7 @@ export interface DeliverableArchivePackage {
 
 // In-memory / localStorage cache for seamless local testing and fallback
 const STORAGE_PREFIX = 'fairlance_ipfs_vault:';
+const inMemoryCache = new Map<string, string>();
 
 export class DeliverableStorageClient {
   private gatewayUrl: string;
@@ -67,9 +68,13 @@ export class DeliverableStorageClient {
 
     // 4. Persist in client storage cache (and pin to backend/IPFS if configured)
     const storageKey = `${STORAGE_PREFIX}${plaintextSha256}`;
+    const serialized = JSON.stringify(archivePackage);
+    inMemoryCache.set(storageKey, serialized);
+    inMemoryCache.set(`${STORAGE_PREFIX}${cid}`, serialized);
+
     if (typeof window !== 'undefined' && window.localStorage) {
       try {
-        localStorage.setItem(storageKey, JSON.stringify(archivePackage));
+        localStorage.setItem(storageKey, serialized);
       } catch (err) {
         console.warn('[DeliverableStorageClient] Local cache quota exceeded, package preserved in runtime memory', err);
       }
@@ -88,10 +93,22 @@ export class DeliverableStorageClient {
     const { sha256OrCid, encryptionSecret } = params;
     const cleanHash = sha256OrCid.replace(/^ipfs:\/\//, '').replace(/^bafybeig/, '');
 
-    // Look up in storage cache
+    // Look up in storage cache (in-memory or localStorage)
     let foundPackage: DeliverableArchivePackage | null = null;
 
-    if (typeof window !== 'undefined' && window.localStorage) {
+    if (inMemoryCache.has(`${STORAGE_PREFIX}${cleanHash}`)) {
+      foundPackage = JSON.parse(inMemoryCache.get(`${STORAGE_PREFIX}${cleanHash}`)!);
+    } else {
+      for (const raw of inMemoryCache.values()) {
+        const parsed = JSON.parse(raw);
+        if (parsed.sha256 === cleanHash || parsed.cid.includes(cleanHash)) {
+          foundPackage = parsed;
+          break;
+        }
+      }
+    }
+
+    if (!foundPackage && typeof window !== 'undefined' && window.localStorage) {
       // Direct lookup by hash
       const direct = localStorage.getItem(`${STORAGE_PREFIX}${cleanHash}`);
       if (direct) {

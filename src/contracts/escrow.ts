@@ -43,20 +43,20 @@ export class EscrowContractClient {
   buildCreateJobOp(params: CreateJobParams): xdr.Operation {
     const scMilestones = params.milestones.map((m) => {
       const cleanHash = m.titleHashHex.replace(/^0x/, '');
-      return nativeToScVal(
-        {
-          amount: m.amount,
-          deadline: m.deadline,
-          title_hash: Buffer.from(cleanHash, 'hex'),
-        },
-        {
-          type: {
-            amount: 'i128',
-            deadline: 'u64',
-            title_hash: 'bytes',
-          },
-        }
-      );
+      return xdr.ScVal.scvMap([
+        new xdr.ScMapEntry({
+          key: xdr.ScVal.scvSymbol('amount'),
+          val: nativeToScVal(m.amount, { type: 'i128' }),
+        }),
+        new xdr.ScMapEntry({
+          key: xdr.ScVal.scvSymbol('deadline'),
+          val: nativeToScVal(m.deadline, { type: 'u64' }),
+        }),
+        new xdr.ScMapEntry({
+          key: xdr.ScVal.scvSymbol('title_hash'),
+          val: nativeToScVal(Buffer.from(cleanHash, 'hex'), { type: 'bytes' }),
+        }),
+      ]);
     });
 
     const scPanel = params.arbitratorPanel.map((addr) =>
