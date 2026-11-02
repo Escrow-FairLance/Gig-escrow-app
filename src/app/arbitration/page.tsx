@@ -14,6 +14,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { useWallet } from '../../wallet/context';
+import { escrowContractClient } from '../../contracts/escrow';
 import { StakingModal } from '../../components/arbitration/StakingModal';
 import { ArbitratorRulingCard } from '../../components/arbitration/ArbitratorRulingCard';
 import { Card, Button, Badge } from '../../components/ui/index';
@@ -55,7 +56,7 @@ const mockDisputes: DisputeCaseItem[] = [
 ];
 
 export default function ArbitrationPage() {
-  const { state: wallet } = useWallet();
+  const { state: wallet, signer } = useWallet();
   const [stakedAmount, setStakedAmount] = useState('1500');
   const [stakingModalOpen, setStakingModalOpen] = useState(false);
   const [disputes, setDisputes] = useState(mockDisputes);
@@ -67,23 +68,31 @@ export default function ArbitrationPage() {
   };
 
   const handleCastVote = async (disputeId: string, bps: number) => {
-    const updated = disputes.map((d) => {
-      if (d.id === disputeId) {
-        return {
-          ...d,
-          votes: [
-            ...d.votes,
-            {
-              arbitrator: wallet.address || 'GDC7...JUROR',
-              freelancerShareBps: bps,
-            },
-          ],
-        };
-      }
-      return d;
-    });
-    setDisputes(updated);
-    showToast(`Ruling (${bps / 100}% share) recorded on Soroban! Consensus updating.`);
+    try {
+      const arbitratorAddr = wallet.address || 'GDC7W8KMQZPXZTR12VWQ56PZTRK88LMN456QAZTYKMPQRSTVWAA';
+      await escrowContractClient.voteDispute(arbitratorAddr, 1n, 0, bps, signer);
+
+      const updated = disputes.map((d) => {
+        if (d.id === disputeId) {
+          return {
+            ...d,
+            votes: [
+              ...d.votes,
+              {
+                arbitrator: arbitratorAddr,
+                freelancerShareBps: bps,
+              },
+            ],
+          };
+        }
+        return d;
+      });
+      setDisputes(updated);
+      showToast(`Ruling (${bps / 100}% share) confirmed on Soroban! Consensus updating.`);
+    } catch (err: any) {
+      console.error('[ArbitrationPage] Vote error:', err);
+      alert(err.message || 'Failed to submit arbitration vote on-chain');
+    }
   };
 
   return (

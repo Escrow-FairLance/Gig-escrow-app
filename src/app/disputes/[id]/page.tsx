@@ -19,9 +19,14 @@ import {
 } from 'lucide-react';
 import { formatAddress, formatStroopsToXlm } from '../../../config/constants';
 import { Card, Badge, Button } from '../../../components/ui/index';
+import { useWallet } from '../../../wallet/context';
+import { escrowContractClient } from '../../../contracts/escrow';
 
 export default function DisputeDetailPage() {
   const params = useParams();
+  const { state: wallet, signer } = useWallet();
+  const [hasVoted, setHasVoted] = useState(false);
+  const [isVoting, setIsVoting] = useState(false);
 
   const mockDispute = {
     id: params.id || 'dispute-5520-indexing',
@@ -186,6 +191,36 @@ export default function DisputeDetailPage() {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Juror Vote Action */}
+        <div className="pt-4 border-t border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="text-xs text-slate-400">
+            Designated panel members cast proportional rulings in basis points (0 - 10,000 bps).
+          </div>
+          <Button
+            variant="primary"
+            disabled={hasVoted || isVoting}
+            isLoading={isVoting}
+            onClick={async () => {
+              setIsVoting(true);
+              try {
+                const arbitratorAddr = wallet.address || 'GDC7W8KMQZPXZTR12VWQ56PZTRK88LMN456QAZTYKMPQRSTVWAA';
+                await escrowContractClient.voteDispute(arbitratorAddr, 1n, mockDispute.milestoneIndex, 5000, signer);
+                setHasVoted(true);
+                alert('Ruling (50% / 50% proportional split) confirmed on Soroban!');
+              } catch (err: any) {
+                console.error('[DisputeDetailPage] Vote error:', err);
+                alert(err.message || 'Failed to submit vote on-chain');
+              } finally {
+                setIsVoting(false);
+              }
+            }}
+            className="text-xs gap-1.5 shadow-glow"
+          >
+            <Scale className="w-3.5 h-3.5" />
+            <span>{hasVoted ? 'Ruling Confirmed on Soroban' : 'Cast Juror Ruling (50/50 Split)'}</span>
+          </Button>
         </div>
       </Card>
     </div>
