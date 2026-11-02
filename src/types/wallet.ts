@@ -21,6 +21,7 @@ export interface WalletState {
   network: string;
   balances: WalletBalance[];
   nativeBalance: string;
+  isUnfunded: boolean;
   error: string | null;
 }
 

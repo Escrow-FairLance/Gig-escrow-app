@@ -1,12 +1,14 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
 import { STELLAR_CONFIG } from '../config/constants';
 import { SupportedWalletId, WalletBalance, WalletState } from '../types/wallet';
 import { getWalletAdapter } from './adapters';
+import { SorobanTransactionSigner } from '../contracts/runner';
 
 interface WalletContextType {
   state: WalletState;
+  signer: SorobanTransactionSigner;
   connect: (walletId: SupportedWalletId) => Promise<void>;
   disconnect: () => void;
   refreshBalances: () => Promise<void>;
@@ -21,11 +23,13 @@ const defaultState: WalletState = {
   network: 'TESTNET',
   balances: [],
   nativeBalance: '0',
+  isUnfunded: false,
   error: null,
 };
 
 const WalletContext = createContext<WalletContextType>({
   state: defaultState,
+  signer: { sign: async () => '' },
   connect: async () => {},
   disconnect: () => {},
   refreshBalances: async () => {},
@@ -39,11 +43,12 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     try {
       const res = await fetch(`${STELLAR_CONFIG.horizonUrl}/accounts/${publicKey}`);
       if (!res.ok) {
-        // Account might not be funded on testnet yet
+        // Unfunded on testnet (404)
         setState((prev) => ({
           ...prev,
-          nativeBalance: '1000.0000000', // Default testnet mock if unfunded
-          balances: [{ assetCode: 'XLM', balance: '1000.0000000' }],
+          nativeBalance: '0.0000000',
+          balances: [{ assetCode: 'XLM', balance: '0.0000000' }],
+          isUnfunded: true,
         }));
         return;
       }
@@ -61,12 +66,14 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         ...prev,
         balances,
         nativeBalance: native,
+        isUnfunded: false,
       }));
     } catch {
       setState((prev) => ({
         ...prev,
-        nativeBalance: '1000.0000000',
-        balances: [{ assetCode: 'XLM', balance: '1000.0000000' }],
+        nativeBalance: '0.0000000',
+        balances: [{ assetCode: 'XLM', balance: '0.0000000' }],
+        isUnfunded: true,
       }));
     }
   };
@@ -119,6 +126,10 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     return adapter.sign(xdr);
   };
 
+  const signer = useMemo<SorobanTransactionSigner>(() => ({
+    sign: async (xdrString: string) => signTransaction(xdrString),
+  }), [state.walletId]);
+
   useEffect(() => {
     const savedWallet = localStorage.getItem('fairlance_wallet') as SupportedWalletId;
     const savedAddr = localStorage.getItem('fairlance_address');
@@ -138,6 +149,7 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     <WalletContext.Provider
       value={{
         state,
+        signer,
         connect,
         disconnect,
         refreshBalances,
