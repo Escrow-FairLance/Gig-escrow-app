@@ -14,6 +14,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { useWallet } from '../../wallet/context';
+import { sep24Client } from '../../contracts/sep24';
 import { Card, Button, Badge, Input } from '../../components/ui/index';
 
 interface AnchorOption {
@@ -85,11 +86,24 @@ export default function FiatRailsPage() {
     }
 
     setIsProcessing(true);
-    // Simulate SEP-24 interactive anchor session
-    await new Promise((r) => setTimeout(r, 2000));
-    setTxRef('SEP24-' + Math.random().toString(36).substring(2, 10).toUpperCase());
-    setIsProcessing(false);
-    setOfframpSuccess(true);
+    try {
+      const userAddr = wallet.address || 'GB6CML3GZYGJ4BLR2PK5QTKQIF6KTT56ZXXTIHXTWG4JAPB3RKDVQTU4';
+      const session = await sep24Client.initiateWithdrawal({
+        anchorDomain: selectedAnchor.id === 'cowrie' ? 'cowrie.exchange' : `${selectedAnchor.id}.com`,
+        assetCode: 'USDC',
+        account: userAddr,
+        amount: amountUsdc,
+        destinationAccount: recipientAccount.trim(),
+      });
+
+      setTxRef(session.id);
+      setIsProcessing(false);
+      setOfframpSuccess(true);
+    } catch (err: any) {
+      console.error('[FiatRails] SEP-24 error:', err);
+      alert(err.message || 'Failed to initiate SEP-24 off-ramp session');
+      setIsProcessing(false);
+    }
   };
 
   return (
