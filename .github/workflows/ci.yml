@@ -7,22 +7,30 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  validate-and-build:
+    name: Lint, Test, Typecheck & Build
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-      - name: Setup Bun
+      - name: Setup Bun Runtime
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
 
       - name: Install Dependencies
-        run: bun install --frozen-lockfile
+        run: bun install
 
-      - name: TypeScript Check
-        run: bun run tsc --noEmit
+      - name: Code Quality & Linting
+        run: bun run lint
 
-      - name: Build Next.js Application
+      - name: TypeScript Type Check
+        run: bun run typecheck
+
+      - name: Unit & Integration Test Suite
+        run: bun run test
+
+      - name: Production Next.js Build
         run: bun run build
