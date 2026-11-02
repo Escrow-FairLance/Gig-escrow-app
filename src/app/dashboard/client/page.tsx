@@ -15,6 +15,7 @@ import {
   Coins,
 } from 'lucide-react';
 import { useWallet } from '../../../wallet/context';
+import { escrowContractClient } from '../../../contracts/escrow';
 import { formatAddress, formatStroopsToXlm } from '../../../config/constants';
 import { ClientReviewModal } from '../../../components/dashboard/ClientReviewModal';
 import { Card, Button, Badge } from '../../../components/ui/index';
@@ -65,7 +66,7 @@ const mockClientJobs: ClientJobItem[] = [
 ];
 
 export default function ClientDashboardPage() {
-  const { state: wallet } = useWallet();
+  const { state: wallet, signer } = useWallet();
   const [jobs, setJobs] = useState<ClientJobItem[]>(mockClientJobs);
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [selectedJob, setSelectedJob] = useState<ClientJobItem | null>(null);
@@ -223,16 +224,37 @@ export default function ClientDashboardPage() {
           deliverableHash={selectedJob.pendingReviewMilestone.deliverableHash}
           revisionCount={selectedJob.pendingReviewMilestone.revisionCount}
           onApprove={async () => {
-            const updated = jobs.map((j) =>
-              j.id === selectedJob.id ? { ...j, pendingReviewMilestone: undefined } : j
-            );
-            setJobs(updated);
+            try {
+              const caller = wallet.address || 'GAAX7KL5JWMQPZTY7XG276QWNR25K4ZTYPQQV9J3KMTRL67WZX';
+              await escrowContractClient.approveMilestone(caller, 1n, selectedJob.pendingReviewMilestone!.idx, signer);
+              const updated = jobs.map((j) =>
+                j.id === selectedJob.id ? { ...j, pendingReviewMilestone: undefined } : j
+              );
+              setJobs(updated);
+            } catch (err: any) {
+              console.error('[ClientDashboard] Approval error:', err);
+              alert(err.message || 'Failed to approve milestone on-chain');
+            }
           }}
           onRequestRevision={async (fb) => {
-            alert('Revision submitted!');
+            try {
+              const caller = wallet.address || 'GAAX7KL5JWMQPZTY7XG276QWNR25K4ZTYPQQV9J3KMTRL67WZX';
+              await escrowContractClient.requestRevision(caller, 1n, selectedJob.pendingReviewMilestone!.idx, '0xfeedbackhash', signer);
+              alert('Revision request committed to Soroban smart contract!');
+            } catch (err: any) {
+              console.error('[ClientDashboard] Revision error:', err);
+              alert(err.message || 'Failed to request revision on-chain');
+            }
           }}
           onOpenDispute={async (reason) => {
-            alert('Dispute opened!');
+            try {
+              const caller = wallet.address || 'GAAX7KL5JWMQPZTY7XG276QWNR25K4ZTYPQQV9J3KMTRL67WZX';
+              await escrowContractClient.openDispute(caller, 1n, selectedJob.pendingReviewMilestone!.idx, '0xdisputereason', signer);
+              alert('Dispute opened and committed to Soroban! Escrow locked.');
+            } catch (err: any) {
+              console.error('[ClientDashboard] Dispute error:', err);
+              alert(err.message || 'Failed to open dispute on-chain');
+            }
           }}
         />
       )}

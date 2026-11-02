@@ -15,6 +15,7 @@ import {
   Landmark,
 } from 'lucide-react';
 import { useWallet } from '../../../wallet/context';
+import { escrowContractClient } from '../../../contracts/escrow';
 import { formatAddress, formatStroopsToXlm } from '../../../config/constants';
 import { DeliverableSubmitModal } from '../../../components/dashboard/DeliverableSubmitModal';
 import { Card, Button, Badge } from '../../../components/ui/index';
@@ -62,7 +63,7 @@ const mockFreelancerTasks: FreelancerMilestoneItem[] = [
 ];
 
 export default function FreelancerDashboardPage() {
-  const { state: wallet } = useWallet();
+  const { state: wallet, signer } = useWallet();
   const [tasks, setTasks] = useState(mockFreelancerTasks);
   const [submitModalOpen, setSubmitModalOpen] = useState(false);
   const [activeTask, setActiveTask] = useState<FreelancerMilestoneItem | null>(null);
@@ -225,13 +226,23 @@ export default function FreelancerDashboardPage() {
           onClose={() => setSubmitModalOpen(false)}
           milestoneTitle={activeTask.title}
           milestoneIndex={activeTask.milestoneIdx}
-          onSubmitSuccess={async (hash, notes) => {
-            const updated = tasks.map((t) =>
-              t.jobId === activeTask.jobId && t.milestoneIdx === activeTask.milestoneIdx
-                ? { ...t, status: 'SUBMITTED' as const }
-                : t
-            );
-            setTasks(updated);
+          jobId={activeTask.jobId}
+          onSubmitSuccess={async (hash, notes, cid) => {
+            try {
+              const caller = wallet.address || 'GB3Y9KM5NPXZTR12VWQ56PZTRK88LMN456QAZTYKMPQRSTVWYZ';
+              await escrowContractClient.submitMilestone(caller, 1n, activeTask.milestoneIdx, hash, signer);
+
+              const updated = tasks.map((t) =>
+                t.jobId === activeTask.jobId && t.milestoneIdx === activeTask.milestoneIdx
+                  ? { ...t, status: 'SUBMITTED' as const }
+                  : t
+              );
+              setTasks(updated);
+              alert('Deliverable submitted and SHA-256 hash anchored to Soroban escrow contract!');
+            } catch (err: any) {
+              console.error('[FreelancerDashboard] Submit milestone error:', err);
+              alert(err.message || 'Failed to submit milestone on-chain');
+            }
           }}
         />
       )}
